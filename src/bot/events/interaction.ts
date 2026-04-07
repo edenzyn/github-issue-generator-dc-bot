@@ -9,6 +9,16 @@ import { CUSTOM_IDS, PUBLIC_COMMANDS } from "../../utils/constants";
 
 //* ====== Interaction Event Handler ====== *//
 export const handleInteraction = async (interaction: Interaction) => {
+  if (!interaction.inGuild()) {
+    if (interaction.isRepliable()) {
+      return interaction.reply({
+        content: "🚫 **Error:** This bot cannot be used in direct messages.",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+    return;
+  }
+
   if (interaction.isChatInputCommand() || interaction.isMessageContextMenuCommand()) {
     const isPublicCmd = (PUBLIC_COMMANDS as readonly string[]).includes(interaction.commandName);
 
