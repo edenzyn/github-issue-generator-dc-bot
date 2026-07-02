@@ -59,8 +59,13 @@ export const uploadAttachmentToGithub = async (
     content: buffer.toString("base64"),
   });
 
-  return (
-    uploadRes.data.content?.download_url ??
-    `https://raw.githubusercontent.com/${ENV.GT_USERNAME}/${ENV.GT_REPOSITORY}/HEAD/${repoPath}`
-  );
+  // For private repos, download_url contains a temporary token that expires.
+  // Instead, return the blob URL with ?raw=true which GitHub renders securely 
+  // as a permanent image for users who have repository access.
+  const htmlUrl = uploadRes.data.content?.html_url;
+  if (htmlUrl) {
+    return `${htmlUrl}?raw=true`;
+  }
+
+  return `https://github.com/${ENV.GT_USERNAME}/${ENV.GT_REPOSITORY}/blob/HEAD/${repoPath}?raw=true`;
 };
